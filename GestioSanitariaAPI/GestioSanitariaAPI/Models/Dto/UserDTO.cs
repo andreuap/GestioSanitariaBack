@@ -1,6 +1,6 @@
-﻿namespace GestioSanitariaAPI.Models
+﻿namespace GestioSanitariaAPI.Models.Dto
 {
-    public class User
+    public class UserDTO
     {
         public Guid Id { get; set; }
         public string UserName { get; set; }
@@ -9,6 +9,5 @@
         public DateTime DataAlta { get; set; }
         public DateTime? DataBaixa { get; set; }
         public bool EsBloquejat { get; set; }
-        public DateTime CreatedDate { get; set; }
     }
 }
