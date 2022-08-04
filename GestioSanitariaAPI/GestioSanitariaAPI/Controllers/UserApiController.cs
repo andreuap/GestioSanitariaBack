@@ -41,5 +41,21 @@ namespace GestioSanitariaAPI.Controllers
 
             return Ok(user);
         }
+
+        [HttpPost]
+        public ActionResult<UserDTO> CreateUser([FromBody]UserDTO userDTO)
+        {
+            if(userDTO == null)
+            {
+                return BadRequest(userDTO);
+            }
+            if(userDTO.Id !=Guid.Empty)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            userDTO.Id = new Guid();
+            return Ok(userDTO);
+        }
     }
 }
