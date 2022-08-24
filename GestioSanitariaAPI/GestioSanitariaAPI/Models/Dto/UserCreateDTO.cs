@@ -2,9 +2,8 @@
 
 namespace GestioSanitariaAPI.Models.Dto
 {
-    public class UserDTO
+    public class UserCreateDTO
     {
-        public Guid Id { get; set; }
         [Required]
         [MaxLength(30)]
         public string UserName { get; set; }
@@ -19,7 +18,5 @@ namespace GestioSanitariaAPI.Models.Dto
         public DateTime? DataBaixa { get; set; }
         [Required]
         public bool EsBloquejat { get; set; }
-
-        public string Token { get; set; }
     }
 }
