@@ -9,6 +9,10 @@ namespace GestioSanitariaAPI.Data
         {
 
         }
+
         public DbSet<User> Users { get; set; }
+        public DbSet<Roles> Roles { get; set; }
+
+        
     }
 }

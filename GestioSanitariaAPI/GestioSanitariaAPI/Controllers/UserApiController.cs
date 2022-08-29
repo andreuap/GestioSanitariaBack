@@ -14,12 +14,6 @@ namespace GestioSanitariaAPI.Controllers
     public class UserApiController : ControllerBase
     {
 
-        List<UserDTO> userList = new List<UserDTO>
-            {
-                new UserDTO { Id = new Guid("f6f020cc-edb7-4809-bf60-8f42b3e67932"), UserName = "andreu", Password = "123456", Email = "andreu@example.com", DataAlta = new DateTime(), DataBaixa = null, EsBloquejat = false },
-                new UserDTO { Id = new Guid("523e1b90-fad9-41be-9f63-0848d2471b30"), UserName = "anna", Password = "7895", Email = "anna@example.com", DataAlta = new DateTime(), DataBaixa = null, EsBloquejat = false }
-            };
-
         private readonly ApplicationDbContext _db;
         private string secretKey;
 
@@ -33,7 +27,8 @@ namespace GestioSanitariaAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<UserDTO>> GetUsers()
         {
-            return Ok(_db.Users.ToList());
+            var usersList = _db.Users.ToList();
+            return Ok(usersList);
         }
 
         [HttpPost()]
@@ -103,7 +98,8 @@ namespace GestioSanitariaAPI.Controllers
                 Email = userDTO.Email,
                 DataAlta = userDTO.DataAlta,
                 DataBaixa = userDTO.DataBaixa,
-                EsBloquejat = userDTO.EsBloquejat
+                EsBloquejat = userDTO.EsBloquejat,
+                Rol = userDTO.Rol
             };
 
             _db.Users.Add(model);

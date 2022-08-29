@@ -14,6 +14,8 @@ namespace GestioSanitariaAPI.Models
         public DateTime DataAlta { get; set; }
         public DateTime? DataBaixa { get; set; }
         public bool EsBloquejat { get; set; }
+
+        public int Rol { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
     }
