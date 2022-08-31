@@ -19,6 +19,8 @@ namespace GestioSanitariaAPI.Models.Dto
         public DateTime? DataBaixa { get; set; }
         [Required]
         public bool EsBloquejat { get; set; }
+
+        public string Rol { get; set; }
         public string Token { get; set; }
     }
 }

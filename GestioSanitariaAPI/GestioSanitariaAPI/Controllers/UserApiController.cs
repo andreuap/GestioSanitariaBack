@@ -4,6 +4,7 @@ using GestioSanitariaAPI.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 
@@ -27,7 +28,20 @@ namespace GestioSanitariaAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<UserDTO>> GetUsers()
         {
-            var usersList = _db.Users.ToList();
+            var usersList = (from u in _db.Users
+                             join r in _db.Roles
+                             on u.Rol equals r.Id
+                             select new
+                             {
+                                 UserName = u.UserName,
+                                 Password = u.Password,
+                                 Email = u.Email,
+                                 DataAlta = u.DataAlta,
+                                 DataBaixa = u.DataBaixa,
+                                 EsBloquejat = u.EsBloquejat,
+                                 Rol = r.Rol
+                             }).ToList();
+
             return Ok(usersList);
         }
 
@@ -38,13 +52,45 @@ namespace GestioSanitariaAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<UserDTO> LoginUser([FromForm] string userName, [FromForm] string password)
         {
+            string nameUser = "";
+            string userRol = "";
+            Boolean esBloquejat = false;
+            DateTime dataAlta = DateTime.MinValue;
+            DateTime? dataBaixa = DateTime.MinValue;
+            string pass = "";
+            string email = "";
             if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
                 // Cambiar para mostrar un mensaje
                 return BadRequest();
             }
 
-            var user = _db.Users.FirstOrDefault(u => u.UserName == userName && u.Password == password);
+            var user = (from u in _db.Users
+                        join r in _db.Roles
+                        on u.Rol equals r.Id
+                        where u.UserName == userName && u.Password == password
+                        select new
+                        {
+                            UserName = u.UserName,
+                            Password = u.Password,
+                            Email = u.Email,
+                            DataAlta = u.DataAlta,
+                            DataBaixa = u.DataBaixa,
+                            EsBloquejat = u.EsBloquejat,
+                            Rol = r.Rol
+                        }).ToList();
+
+            foreach (var u in user)
+            {
+                nameUser = u.UserName;
+                userRol = u.Rol;
+                esBloquejat = u.EsBloquejat;
+                dataAlta = u.DataAlta;
+                dataBaixa = u.DataBaixa;
+                pass = u.Password;
+                email = u.Email;
+
+            }
 
             if (user == null)
             {
@@ -57,9 +103,10 @@ namespace GestioSanitariaAPI.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.UserName)
+                    new Claim(ClaimTypes.Name, nameUser),
+                    new Claim(ClaimTypes.Role, userRol)
                 }),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -67,12 +114,13 @@ namespace GestioSanitariaAPI.Controllers
 
             var userDTO = new UserDTO
             {
-                UserName = user.UserName,
-                Password = user.Password,
-                Email = user.Email,
-                DataAlta = user.DataAlta,
-                DataBaixa = user.DataBaixa,
-                EsBloquejat = user.EsBloquejat,
+                UserName = nameUser,
+                Password = pass,
+                Email = email,
+                DataAlta = dataAlta,
+                DataBaixa = dataBaixa,
+                EsBloquejat = esBloquejat,
+                Rol = userRol,
                 Token = tokenHandler.WriteToken(token)
             };
 
@@ -97,8 +145,6 @@ namespace GestioSanitariaAPI.Controllers
                 Password = userDTO.Password,
                 Email = userDTO.Email,
                 DataAlta = userDTO.DataAlta,
-                DataBaixa = userDTO.DataBaixa,
-                EsBloquejat = userDTO.EsBloquejat,
                 Rol = userDTO.Rol
             };
 
