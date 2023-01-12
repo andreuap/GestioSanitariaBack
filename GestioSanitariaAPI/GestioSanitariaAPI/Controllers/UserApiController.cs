@@ -18,10 +18,15 @@ namespace GestioSanitariaAPI.Controllers
         private readonly ApplicationDbContext _db;
         private string secretKey;
 
+        //private readonly HttpContextAccessor _httpContextAccessor;
+
+        Guid userId = Guid.Empty;
+
         public UserApiController(ApplicationDbContext db, IConfiguration _configuration)
         {
             _db = db;
-            secretKey = _configuration.GetValue<string>("ApiSettings:Secret");
+            secretKey = _configuration.GetValue<string>("JWT:Secret");
+
         }
 
         [HttpGet]
@@ -59,6 +64,9 @@ namespace GestioSanitariaAPI.Controllers
             DateTime? dataBaixa = DateTime.MinValue;
             string pass = "";
             string email = "";
+            List<string> claimList = new List<string>();
+            JwtSecurityToken token = new JwtSecurityToken();
+
             if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
                 // Cambiar para mostrar un mensaje
@@ -71,6 +79,7 @@ namespace GestioSanitariaAPI.Controllers
                         where u.UserName == userName && u.Password == password
                         select new
                         {
+                            Id = u.Id,
                             UserName = u.UserName,
                             Password = u.Password,
                             Email = u.Email,
@@ -82,6 +91,7 @@ namespace GestioSanitariaAPI.Controllers
 
             foreach (var u in user)
             {
+                userId = u.Id;
                 nameUser = u.UserName;
                 userRol = u.Rol;
                 esBloquejat = u.EsBloquejat;
@@ -99,18 +109,17 @@ namespace GestioSanitariaAPI.Controllers
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(secretKey);
 
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var claims = new[]
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
+                    new Claim(ClaimTypes.Sid, userId.ToString()),
                     new Claim(ClaimTypes.Name, nameUser),
                     new Claim(ClaimTypes.Role, userRol)
-                }),
-                Expires = DateTime.UtcNow.AddDays(1),
-                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+                        
+            token = new JwtSecurityToken(claims: claims,
+                                         expires: DateTime.UtcNow.AddDays(1),
+                                         signingCredentials: new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature));
 
             var userDTO = new UserDTO
             {

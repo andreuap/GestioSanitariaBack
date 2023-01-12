@@ -4,6 +4,7 @@ using GestioSanitariaAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GestioSanitariaAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221021082013_ModifyPacientesEntity")]
+    partial class ModifyPacientesEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,9 +36,6 @@ namespace GestioSanitariaAPI.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DataNeixament")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Domicili")
                         .HasColumnType("nvarchar(max)");
 
@@ -53,9 +52,6 @@ namespace GestioSanitariaAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nom")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NumeroHistoriaClinica")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PrimerCognom")
